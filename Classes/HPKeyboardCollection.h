@@ -12,7 +12,7 @@
 
 #import "HPKeyboardCollectionItem.h"
 
-@protocol HPKeyboardColelctionDelegate <NSObject>
+@protocol HPKeyboardCollectionDelegate <NSObject>
 
 - (void)collectionKeyPressed:(HPKeyboardCollectionItem *)keyItem;
 - (void)collectionBarButtonPressed:(UIButton *)button;
@@ -25,7 +25,7 @@
 @property (nonatomic, strong) UIPageControl *pageControl;
 @property (nonatomic, strong) UIButton *barButton;
 @property (nonatomic, strong) UILabel *title;
-@property (nonatomic, weak) id <HPKeyboardColelctionDelegate> collectionDelegate;
+@property (nonatomic, weak) id <HPKeyboardCollectionDelegate> collectionDelegate;
 
 - (void)addKeyItem:(HPKeyboardCollectionItem *)keyItem;
 

@@ -17,7 +17,7 @@ CGFloat const HPKeyboardDefaultSizeHeigt = 216;
 CGFloat const HPKeyboardTabDefaultHeight = 35;
 NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboardDidSwitchToDefaultKeyboardNotification";
 
-@interface HPKeyboard () <HPKeyboardColelctionDelegate>
+@interface HPKeyboard () <HPKeyboardCollectionDelegate>
 
 @property (nonatomic, weak, readwrite) UIResponder<UITextInput> *textInput;
 @property (nonatomic, weak) HPKeyboardCollection *currentCollection;
