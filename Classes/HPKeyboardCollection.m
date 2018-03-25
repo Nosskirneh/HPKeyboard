@@ -44,8 +44,8 @@
     [self setPagingEnabled:YES];
     [self setBackgroundColor:[UIColor clearColor]];
     [self setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
-    [self setFrame:(CGRect){0, 0, UIScreen.mainScreen.bounds.size.width,
-      HPKeyboardDefaultSizeHeigt - HPKeyboardTabDefaultHeight}];
+    [self setFrame:CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width,
+                              HPKeyboardDefaultSizeHeigt - HPKeyboardTabDefaultHeight)];
     [self registerClass:[HPKeyboardCollectionCell class] forCellWithReuseIdentifier:KEY_CELL];
     _pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, 10, CGRectGetWidth(self.bounds), 20)];
     [_pageControl setPageIndicatorTintColor:[UIColor lightGrayColor]];
@@ -53,18 +53,20 @@
     [_pageControl setBackgroundColor:[UIColor clearColor]];
     [_pageControl setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin];
     [_pageControl setUserInteractionEnabled:NO];
-    
+
     _title = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, CGRectGetWidth(self.bounds), 20)];
     [_title setBackgroundColor:[UIColor clearColor]];
     [_title setTextColor:[UIColor grayColor]];
     [_title setTextAlignment:NSTextAlignmentCenter];
     [_title setFont:[UIFont fontWithName:@"HelveticaNeue" size:12]];
-    
+
     _barButton = [[UIButton alloc] init];
     [_barButton setContentMode:UIViewContentModeScaleAspectFit];
     [_barButton addTarget:self action:@selector(barButtonDidWhenTouchDown:) forControlEvents:UIControlEventTouchDown];
-    
-    // Long touch.
+    [_barButton addTarget:self action:@selector(barButtonDidWhenTouchDown:) forControlEvents:UIControlEventTouchDown];
+    [_barButton addTarget:self action:@selector(multipleTap:withEvent:) forControlEvents:UIControlEventTouchDownRepeat];
+
+    // Long touch
     UILongPressGestureRecognizer *longTouch = [[UILongPressGestureRecognizer alloc] initWithTarget:self
                                                                                             action:@selector(handleLongTouch:)];
     [longTouch setMinimumPressDuration:0.09];
@@ -77,6 +79,14 @@
 - (void)barButtonDidWhenTouchDown:(UIButton *)button {
     if ([self.collectionDelegate respondsToSelector:@selector(collectionBarButtonPressed:)]) {
         [self.collectionDelegate collectionBarButtonPressed:button];
+    }
+}
+
+- (void)multipleTap:(UIButton *)button withEvent:(UIEvent *)event {
+    UITouch *touch = [[event allTouches] anyObject];
+    if (touch.tapCount == 2 &&
+        [self.collectionDelegate respondsToSelector:@selector(collectionBarButtonDoubleTapped:)]) {
+        [self.collectionDelegate collectionBarButtonDoubleTapped:button];
     }
 }
 

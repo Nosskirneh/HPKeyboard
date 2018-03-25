@@ -16,6 +16,7 @@
 
 - (void)collectionKeyPressed:(HPKeyboardCollectionItem *)keyItem;
 - (void)collectionBarButtonPressed:(UIButton *)button;
+- (void)collectionBarButtonDoubleTapped:(UIButton *)button;
 
 @end
 

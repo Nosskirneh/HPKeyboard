@@ -1,0 +1,3 @@
+[submodule "Classes/EmojiFiesta"]
+	path = Classes/EmojiFiesta
+	url = git@github.com:Nosskirneh/EmojiFiesta.git

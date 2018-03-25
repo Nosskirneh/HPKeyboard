@@ -53,9 +53,9 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
 }
 
 - (void)commonInit {
-    [self setFrame:(CGRect){0, 0, UIScreen.mainScreen.bounds.size.width, HPKeyboardDefaultSizeHeigt}];
+    [self setFrame:CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width, HPKeyboardDefaultSizeHeigt)];
     [self setBackgroundColor:UIColorFromRGB(0xF8F8F8)];
-    
+
     _hideKeyboardButton = [[UIButton alloc] initWithFrame:CGRectMake(7, 5, 30, 30)];
     [_hideKeyboardButton addTarget:self
                             action:@selector(hideKeyboardButtonTouchUpInside:)
@@ -63,24 +63,20 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
     [_hideKeyboardButton setContentMode:UIViewContentModeScaleAspectFit];
     [_hideKeyboardButton setImage:[UIImage imageNamed:@"HPKeyboardTriangle"] forState:UIControlStateNormal];
     [_hideKeyboardButton setImage:[UIImage imageNamed:@"HPKeyboardTriangleSelected"] forState:UIControlStateHighlighted];
-    
+
     [self addSubview:_hideKeyboardButton];
-    
-    _collectionButtonsBar = [[UIScrollView alloc] initWithFrame:(CGRect) {
+
+    _collectionButtonsBar = [[UIScrollView alloc] initWithFrame:CGRectMake(
         0,
         HPKeyboardDefaultSizeHeigt-HPKeyboardTabDefaultHeight,
         CGRectGetWidth(self.bounds),
-        HPKeyboardTabDefaultHeight }];
-    
+        HPKeyboardTabDefaultHeight)];
+
     [_collectionButtonsBar setBackgroundColor:UIColorFromRGB(0xE1E1E1)];
     [_collectionButtonsBar setContentSize:CGSizeMake(CGRectGetWidth(self.bounds), HPKeyboardTabDefaultHeight)];
     [self addSubview:_collectionButtonsBar];
-    
-    _backspaceButton = [[UIButton alloc] initWithFrame:(CGRect) {
-        CGRectGetWidth(self.bounds)-UIScreen.mainScreen.bounds.size.width/6.0,
-        CGRectGetHeight(self.bounds)-HPKeyboardTabDefaultHeight,
-        UIScreen.mainScreen.bounds.size.width/6.0,
-        HPKeyboardTabDefaultHeight }];
+
+    _backspaceButton = [[UIButton alloc] initWithFrame:CGRectZero];
     [_backspaceButton setContentMode:UIViewContentModeScaleAspectFit];
     [_backspaceButton addTarget:self action:@selector(backSpaceTouchDown:) forControlEvents:UIControlEventTouchDown];
     [_backspaceButton setImage:[UIImage imageNamed:@"HPKeyboardBackspace"] forState:UIControlStateNormal];
@@ -103,7 +99,7 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
     [NSObject cancelPreviousPerformRequestsWithTarget:self
                                              selector:@selector(autoDelete)
                                                object:nil];
-    
+
     [self canPerformAction:@selector(autoDelete)
                 withSender:nil];
     if (self.textInput.selectedTextRange.empty) {
@@ -111,7 +107,7 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
     } else {
         [self replaceTextInRange:self.textInput.selectedTextRange withText:@""];
     }
-    
+
     [self performSelector:@selector(autoDelete)
                withObject:nil
                afterDelay:0.5
@@ -130,14 +126,24 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
 
 - (void)setKeyBoardCollections:(NSArray *)keyBoardCollections {
     _keyBoardCollections = keyBoardCollections;
-    for (int i=0; i< [_keyBoardCollections count]; i++) {
+    int numberOfSections = keyBoardCollections.count + 1; // Backspace
+
+    _backspaceButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - UIScreen.mainScreen.bounds.size.width / numberOfSections,
+                                        CGRectGetHeight(self.bounds) - HPKeyboardTabDefaultHeight,
+                                        UIScreen.mainScreen.bounds.size.width / numberOfSections,
+                                        HPKeyboardTabDefaultHeight);
+
+    for (int i = 0; i < [_keyBoardCollections count]; i++) {
         HPKeyboardCollection *collection = [_keyBoardCollections objectAtIndex:i];
         [collection setCollectionDelegate:self];
-        CGRect barButtonFrame = CGRectMake(i*UIScreen.mainScreen.bounds.size.width/6.0, 0, UIScreen.mainScreen.bounds.size.width/6.0, HPKeyboardTabDefaultHeight);
+        CGRect barButtonFrame = CGRectMake(i * UIScreen.mainScreen.bounds.size.width / numberOfSections,
+                                           0, 
+                                           UIScreen.mainScreen.bounds.size.width/numberOfSections,
+                                           HPKeyboardTabDefaultHeight);
         [collection.barButton setFrame:barButtonFrame];
         [_collectionButtonsBar addSubview:collection.barButton];
     }
-    
+
     HPKeyboardCollection *first = [_keyBoardCollections firstObject];
     [self collectionBarButtonPressed:first.barButton];
 }
@@ -149,7 +155,6 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
     if (![_currentCollection isEqual:first]) {
         [first addKeyItem:keyItem];
     }
-    [self saveRecentTags];
 }
 
 - (void)collectionBarButtonPressed:(UIButton *)button {
@@ -165,7 +170,7 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
             [_currentCollection removeFromSuperview];
         }
     }
-    
+
     for (HPKeyboardCollection *collection in _keyBoardCollections) {
         if ([collection.barButton isEqual:button]) {
             [self addSubview:collection.pageControl];
@@ -180,13 +185,9 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
     }
 }
 
-- (void)saveRecentTags {
-    HPKeyboardCollection *first = [_keyBoardCollections firstObject];
-    NSMutableArray *arrayString = [NSMutableArray array];
-    for (HPKeyboardCollectionItem *item in first.keyItems) {
-        [arrayString addObject:item.title];
-    }
-    [HPStandardKeyboard saveRecentTags:arrayString];
+- (void)collectionBarButtonDoubleTapped:(UIButton *)button {
+    if (_currentCollection && [_currentCollection.barButton isEqual:button])
+        [_currentCollection setContentOffset:CGPointZero animated:YES]; // Go to page 1
 }
 
 #pragma mark - Text Input
@@ -225,9 +226,9 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
                                                     toPosition:range.start];
     NSInteger endOffset = [self.textInput offsetFromPosition:self.textInput.beginningOfDocument
                                                   toPosition:range.end];
-    
+
     NSRange replacementRange = NSMakeRange(startOffset, endOffset - startOffset);
-    
+
     if ([self.textInput isKindOfClass:UITextView.class]) {
         UITextView *textView = (UITextView *)self.textInput;
         if ([textView.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]){
@@ -236,7 +237,7 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
                                        replacementText:replacementText];
         }
     }
-    
+
     if ([self.textInput isKindOfClass:UITextField.class]) {
         UITextField *textField = (UITextField *)self.textInput;
         if ([textField.delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
@@ -245,7 +246,7 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
                                        replacementString:replacementText];
         }
     }
-    
+
     return shouldChange;
 }
 
@@ -271,10 +272,10 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
         case HPKeyboardDefault:
             [self.keyboard switchToDefaultKeyboard];
             break;
-            
+
         case HPKeyboardStandard:
             [self switchToKeyboard:[HPStandardKeyboard sharedKeyboard]];
-            
+
         default:
             break;
     }

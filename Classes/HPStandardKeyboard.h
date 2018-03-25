@@ -12,6 +12,5 @@
 @interface HPStandardKeyboard : NSObject
 
 + (HPKeyboard *)sharedKeyboard;
-+ (void)saveRecentTags:(NSArray *)array;
 
 @end
