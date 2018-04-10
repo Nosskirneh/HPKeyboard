@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 CoreDump. All rights reserved.
 //
 
-#define KeyboardRecentTagsPlist @"HPKeyboardRecentTags.plist"
-
 #import "HPStandardKeyboard.h"
 #import "HPKeyboardCollection.h"
 #import "HPKeyboardCollectionItem.h"
@@ -16,14 +14,13 @@
 @implementation HPStandardKeyboard
 
 + (HPKeyboard *)sharedKeyboard {
-    
     static dispatch_once_t once;
     static id sharedKeyboard;
     dispatch_once(&once, ^{
         sharedKeyboard = [HPKeyboard keyboard];
         [self initKeyboard:sharedKeyboard];
-        
     });
+
     return sharedKeyboard;
 }
 
@@ -54,8 +51,8 @@
             imageName = @"HPKeyboardActivity";
         else if ([category.id hasSuffix:@"Celebration"])
             imageName = @"HPKeyboardCelebration";
-        else if ([category.id hasSuffix:@"TravelAndPlaces"])
-            imageName = @"HPKeyboardTravel";
+        else if ([category.id hasSuffix:@"Places"])
+            imageName = @"HPKeyboardPlaces";
         else if ([category.id hasSuffix:@"Symbols"])
             imageName = @"HPKeyboardSymbols";
         else if ([category.id hasSuffix:@"Objects"])

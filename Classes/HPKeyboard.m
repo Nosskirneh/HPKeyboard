@@ -15,7 +15,7 @@
 
 CGFloat const HPKeyboardDefaultSizeHeigt = 216;
 CGFloat const HPKeyboardTabDefaultHeight = 35;
-NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboardDidSwitchToDefaultKeyboardNotification";
+NSString *const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboardDidSwitchToDefaultKeyboardNotification";
 
 @interface HPKeyboard () <HPKeyboardCollectionDelegate>
 
@@ -102,11 +102,10 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
 
     [self canPerformAction:@selector(autoDelete)
                 withSender:nil];
-    if (self.textInput.selectedTextRange.empty) {
+    if (self.textInput.selectedTextRange.empty)
         [self.textInput deleteBackward];
-    } else {
+    else
         [self replaceTextInRange:self.textInput.selectedTextRange withText:@""];
-    }
 
     [self performSelector:@selector(autoDelete)
                withObject:nil
@@ -152,9 +151,8 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
     [self inputText:keyItem.character];
     [UIDevice.currentDevice playInputClick];
     HPKeyboardCollection *first = [_keyBoardCollections firstObject];
-    if (![_currentCollection isEqual:first]) {
+    if (![_currentCollection isEqual:first])
         [first addKeyItem:keyItem];
-    }
 }
 
 - (void)collectionBarButtonPressed:(UIButton *)button {
@@ -215,9 +213,8 @@ NSString * const HPKeyboardDidSwitchToDefaultKeyboardNotification = @"HPKeyboard
 }
 
 - (void)replaceTextInRange:(UITextRange *)range withText:(NSString *)text {
-    if (range && [self textInputShouldReplaceTextInRange:range replacementText:text]) {
+    if (range && [self textInputShouldReplaceTextInRange:range replacementText:text])
         [self.textInput replaceRange:range withText:text];
-    }
 }
 
 - (BOOL)textInputShouldReplaceTextInRange:(UITextRange *)range replacementText:(NSString *)replacementText {
